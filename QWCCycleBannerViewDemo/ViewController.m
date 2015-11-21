@@ -27,6 +27,9 @@
     cycleBannerView.autoPlayInterval = 2.0f;
     cycleBannerView.continuous = YES;
     
+    
+   
+    
 }
 
 #pragma mark - dataSource
@@ -43,8 +46,18 @@
 
 -(UIImage *)cycleBannerPlaceHolderImageWithIndex:(NSInteger)index{
     
+    // 这里使用代码创建一个纯色的UIImage
     
-    return [UIImage imageNamed:@"placeholder"];
+    CGSize imageSize = CGSizeMake( self.view.frame.size.width, 100.0f);
+    UIColor *fillColor = [UIColor lightGrayColor];
+    UIGraphicsBeginImageContextWithOptions( imageSize, YES, 0);
+    CGContextRef context = UIGraphicsGetCurrentContext();
+    [fillColor setFill];
+    CGContextFillRect( context, CGRectMake( 0.0f, 0.0f, imageSize.width, imageSize.height));
+    UIImage *image = UIGraphicsGetImageFromCurrentImageContext();
+    UIGraphicsEndImageContext();
+    
+    return image; //[UIImage imageNamed:@"placeholder"];
 }
 
 -(UIViewContentMode)cycleBannerImageContentMode{
