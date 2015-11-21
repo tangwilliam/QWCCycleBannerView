@@ -2,7 +2,7 @@
 //  QWCCycleBannerViewDemoUITests.m
 //  QWCCycleBannerViewDemoUITests
 //
-//  Created by 唐秦崴 on 15/11/18.
+//  Created by tangqinwei on 15/11/18.
 //  Copyright © 2015年 tangqinwei. All rights reserved.
 //
 
