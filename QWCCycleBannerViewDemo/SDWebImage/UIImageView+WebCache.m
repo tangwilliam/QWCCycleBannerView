@@ -60,8 +60,11 @@ static char imageURLKey;
                     return;
                 }
                 else if (image) {
+                    
                     wself.image = image;
                     [wself setNeedsLayout];
+                    
+                    
                 } else {
                     if ((options & SDWebImageDelayPlaceholder)) {
                         wself.image = placeholder;

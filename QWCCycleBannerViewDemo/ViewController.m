@@ -10,7 +10,7 @@
 #import <SDWebImage/UIImageView+WebCache.h>
 #import "QWCCycleBannerView.h"
 
-@interface ViewController ()<QWCCycleBannerViewDataSource>
+@interface ViewController ()<QWCCycleBannerViewDataSource,QWCCycleBannerViewDelegate>
 
 @end
 
@@ -23,9 +23,10 @@
     
     [self.view addSubview:cycleBannerView];
     
-    cycleBannerView.dataSource = self;
+    cycleBannerView.dataSource       = self;
+    cycleBannerView.delegate         = self;
     cycleBannerView.autoPlayInterval = 2.0f;
-    cycleBannerView.continuous = YES;
+    cycleBannerView.continuous       = YES;
     
     
    
@@ -64,6 +65,16 @@
     
     return UIViewContentModeScaleAspectFill;
 }
+
+#pragma mark - delegate
+
+-(void)cycleBannerView:(QWCCycleBannerView *)cycleBanerView didSelectImageViewAtIndex:(NSInteger)index{
+    
+    NSLog(@"点击了第 %ld 页", (long)index); //test
+    
+}
+
+
 
 
 @end

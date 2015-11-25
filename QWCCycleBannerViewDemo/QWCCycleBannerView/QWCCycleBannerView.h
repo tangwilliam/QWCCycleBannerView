@@ -8,6 +8,10 @@
 
 #import <UIKit/UIKit.h>
 
+@class QWCCycleBannerView;
+
+// 数据源
+
 @protocol QWCCycleBannerViewDataSource <NSObject>
 
 @required
@@ -18,6 +22,16 @@
 -(UIViewContentMode) cycleBannerImageContentMode;
 
 @end
+
+// 操作代理
+
+@protocol QWCCycleBannerViewDelegate <NSObject>
+
+@optional
+-(void) cycleBannerView:(QWCCycleBannerView *) cycleBanerView didSelectImageViewAtIndex:(NSInteger) index;
+
+@end
+
 
 @interface QWCCycleBannerView : UIView
 
@@ -30,7 +44,11 @@
 @property (assign,nonatomic, getter=isContinuous) BOOL continuous;
 
 @property (weak,nonatomic) id<QWCCycleBannerViewDataSource> dataSource;
+@property (weak,nonatomic) id<QWCCycleBannerViewDelegate> delegate;
 
+// public methods
+
+-(void) setCurrentPage:(NSInteger) page Animated:(BOOL) animated;
 
 @end
 

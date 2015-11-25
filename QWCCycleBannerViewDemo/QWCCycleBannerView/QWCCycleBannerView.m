@@ -65,6 +65,9 @@
     _scrollView.delegate = self;
     [self addSubview:_scrollView];
     
+    // 添加触摸事件
+    UITapGestureRecognizer *tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(handleTapScrollView:)];
+    [_scrollView addGestureRecognizer:tap];
 }
 
 -(void) initPageControl{
@@ -111,6 +114,7 @@
             if ([self.dataSource respondsToSelector:@selector(cycleBannerPlaceHolderImageWithIndex:)]) {
                 
                 UIImage *placeHolder = [self.dataSource cycleBannerPlaceHolderImageWithIndex:idx];
+                
                 [imageView setImageWithURL:[NSURL URLWithString:urlString ] placeholderImage:placeHolder];
                 
             }else{
@@ -119,6 +123,7 @@
             }
             
             [imageViewArray addObject:imageView];
+            
             
         }];
         
@@ -160,8 +165,46 @@
     _pageControl.currentPage = 0;
 }
 
+#pragma mark - 销毁相关
 
-#pragma mark - 辅助逻辑
+
+#pragma mark - 事件处理
+
+-(void) handleTapScrollView:(UITapGestureRecognizer *)sender{
+    
+    if ( sender.state == UIGestureRecognizerStateEnded ) {
+
+        CGPoint position = [sender locationInView:sender.view];
+        NSInteger currentPage = floor( position.x / _scrollView.frame.size.width);
+        
+        if ( _imageViewArray.count ) {
+            
+            if ( self.isContinuous ) {
+                
+                if ( currentPage > _imageViewArray.count - 2 ) {
+                    
+                    currentPage = 0;
+                    
+                }else if( currentPage < 1 ){
+                    
+                    currentPage = MAX( 0, _imageViewArray.count - 3 );
+                }else{
+                    
+                    currentPage--;
+                }
+            }
+        }
+
+        if ( [self.delegate respondsToSelector:@selector(cycleBannerView:didSelectImageViewAtIndex:)]) {
+            
+            [self.delegate cycleBannerView:self didSelectImageViewAtIndex:currentPage];
+        }
+        
+    }
+}
+
+
+#pragma mark - 业务逻辑
 
 -(void) autoScroll:( NSNumber *) interval{
     
@@ -171,8 +214,16 @@
     
     if (timeInterval) {
         
-        [self moveToOffset:(_scrollView.contentOffset.x + _scrollView.frame.size.width) animated:YES];
+        CGFloat targetX = _scrollView.contentOffset.x + _scrollView.frame.size.width;
+    
+        // 对于非连续的模式，如果滑出了屏幕最右侧，就让其滑至最初的原始位置
+        if(( !self.isContinuous )&&( targetX >= _scrollView.contentSize.width )) {
+         
+            targetX = 0;
+        }
         
+        [self moveToOffset:targetX animated:YES];
+
         [self performSelector:_cmd withObject:interval afterDelay:timeInterval];
         
     }
@@ -182,6 +233,46 @@
 -(void) moveToOffset:(CGFloat) targetOffset animated:(BOOL) animated{
     
     [_scrollView scrollRectToVisible:CGRectMake( targetOffset, 0.0f, _scrollView.frame.size.width, _scrollView.frame.size.height) animated:animated];
+}
+
+-(void)setCurrentPage:(NSInteger)page Animated:(BOOL)animated{
+    
+    NSInteger totalPage;
+    CGFloat pageWidth = _scrollView.frame.size.width;
+    
+    if( self.isContinuous ){
+        
+        if (_imageViewArray.count > 2 ) {
+            
+            totalPage = _imageViewArray.count - 2;
+
+        }else{
+            
+            totalPage = 0;
+        }
+        
+        if ( page >= totalPage ) {
+            
+            [self moveToOffset: totalPage * pageWidth animated:animated];
+            
+        }else{
+                [self moveToOffset:MAX( 1, page + 1 ) * pageWidth animated:animated];
+        }
+    
+    }else{
+        
+        totalPage = _imageViewArray.count;
+        
+        if ( page >= totalPage ) {
+            
+            [self moveToOffset:(totalPage - 1 ) * pageWidth animated:animated];
+        }else{
+            
+            [self moveToOffset:( MAX( 0, page) * pageWidth ) animated:animated];
+        }
+        
+    }
+    
 }
 
 
@@ -225,6 +316,7 @@
     _pageControl.currentPage = currentPage;
     
 }
+
 
 /*
 // Only override drawRect: if you perform custom drawing.
